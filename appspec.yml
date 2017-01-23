@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /home/ec2-user/api-deployment
+    destination: /home/ec2-user/api-deployment/spring17-API-Server
 hooks:
   AfterInstall:
     - location: /spring17-API-Server/build-scripts/codeDeployInstall.sh
