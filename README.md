@@ -2,4 +2,4 @@
 
 ##API Server for Spring 2017 class
 
-A mock thrift service built to mimic a gateway api
+A mock thrift service built to mimic a gateway api, refer [WIKI](https://github.com/airavata-courses/spring17-API-Server/wiki) for more details !!!
