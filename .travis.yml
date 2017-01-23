@@ -14,6 +14,7 @@ script: mvn clean install
 
 before_deploy:
   - cd ..
+  - cp spring17-API-Server/appspec.yml .
   - zip -r spring17-API-Server.zip spring17-API-Server appspec.yml || true
   - mkdir -p "dpl_cd_upload"
   - mv spring17-API-Server.zip dpl_cd_upload/spring17-API-Server.zip || true
