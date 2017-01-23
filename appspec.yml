@@ -1,0 +1,10 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /home/ec2-user/api-deployment
+hooks:
+  AfterInstall:
+    - location: /spring17-API-Server/build-scripts/codeDeployInstall.sh
+      timeout: 300
+runas: root

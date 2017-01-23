@@ -1,0 +1,47 @@
+anguage: java
+branches:
+  only:
+    - master
+    - Milestone-5
+notifications:
+  email:
+    - bhandar.anuj@gmail.com
+jdk:
+  - oraclejdk8
+sudo: false
+install: true
+script: mvn clean install
+
+before_deploy:
+  - cd ..
+  - zip -r spring17-API-Server.zip spring17-API-Server appspec.yml || true
+  - mkdir -p "dpl_cd_upload"
+  - mv spring17-API-Server.zip dpl_cd_upload/spring17-API-Server.zip || true
+
+deploy:
+  - provider: s3
+    access_key_id: $AWS_ACCESS_KEY # declared in Travis repo settings
+    secret_access_key: $AWS_SECRET_KEY
+    local_dir: dpl_cd_upload
+    bucket: spring17-api-gateway-travis-ci
+    region: us-east-2
+    skip_cleanup: true
+    acl: public_read
+    detect_encoding: true
+    on:
+      repo: airavata-courses/spring17-API-Server
+      all_branches: true
+  - provider: codedeploy
+    access_key_id: $AWS_ACCESS_KEY # declared in Travis repo settings
+    secret_access_key: $AWS_SECRET_KEY
+    bucket: spring17-api-gateway-travis-ci
+    key: spring17-API-Server.zip
+    bundle_type: zip
+    application: spring17-api-gateway-codeDeployApp
+    deployment_group: production
+    region: us-east-2
+    on:
+      repo: airavata-courses/spring17-API-Server
+      all_branches: true
+after_deploy:
+- echo "Performing after deploy procedures..."
