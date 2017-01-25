@@ -40,6 +40,24 @@ sudo ./install auto
 # start aws code deploy agent if not started already
 sudo service codedeploy-agent start
 
+#install docker engine and start it
+sudo yum install -y docker
+sudo service docker start
+
+# Creating alias for determining the wan ip address and lan ip address of the instance
+alias wanip="dig +short myip.opendns.com @resolver1.opendns.com"
+alias lanip="ifconfig eth0 | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p'"
+
+#adding the aliases to .bashrc to make them persistant
+echo "alias wanip=\"dig +short myip.opendns.com @resolver1.opendns.com\"" >> .bashrc
+echo "alias lanip=\"ifconfig eth0 | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p'\"" >> .bashrc
+
+#run consul on instance
+sudo docker run --net=host  -d  -e 'CONSUL_LOCAL_CONFIG={"translate_wan_addrs": true}' consul \
+        agent -server  -advertise $(lanip) -ui -advertise-wan $(wanip) -bootstrap-expect=1 -datacenter=dc1 \
+         -encrypt HCQzlj+MCHSuybNaGJZbPA== -client=0.0.0.0 -retry-join-wan= <HA-server>
+
+
 # deploying spring17-api-gateway
 mkdir api-deployment
 cd api-deployment/
