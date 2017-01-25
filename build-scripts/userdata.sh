@@ -3,18 +3,6 @@
 # Update the operating System
 sudo yum -y update
 
-#installing open-jdk
-sudo yum install -y java-1.8.0-openjdk-devel.x86_64
-
-#installing apache-maven for building
-sudo wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
-sudo sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
-sudo yum install -y apache-maven
-
-# Setting default JDK to 1.8
-sudo update-alternatives --set java /usr/lib/jvm/jre-1.8.0-openjdk.x86_64/bin/java
-sudo update-alternatives --set javac /usr/lib/jvm/java-1.8.0-openjdk.x86_64/bin/javac
-
 # Installing git version control
 sudo yum install -y git-all.noarch
 
@@ -52,19 +40,10 @@ alias lanip="ifconfig eth0 | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.)
 echo "alias wanip=\"dig +short myip.opendns.com @resolver1.opendns.com\"" >> .bashrc
 echo "alias lanip=\"ifconfig eth0 | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p'\"" >> .bashrc
 
-#run consul on instance
-sudo docker run --net=host  -d  -e 'CONSUL_LOCAL_CONFIG={"translate_wan_addrs": true}' consul \
-        agent  -advertise $(lanip) -ui -advertise-wan $(wanip) -client=0.0.0.0 -retry-join-wan= <HA-server>
+#run consul in server mode on instance
+sudo docker run --restart unless-stopped --net=host  -d  -e 'CONSUL_LOCAL_CONFIG={"translate_wan_addrs": true}' consul \
+        agent -server -bootstrap-expect=1  -advertise $(lanip) -ui -advertise-wan $(wanip) -client=0.0.0.0
 
 
-# deploying spring17-api-gateway
-mkdir api-deployment
-cd api-deployment/
-git clone https://github.com/airavata-courses/spring17-API-Server.git
-cd spring17-API-Server/
-git checkout develop
-mvn clean install
-nohup java -jar mock-airavata-api-server/target/mock-airavata-api-server-0.15-SNAPSHOT.jar &
-
-# Test deployment, uncomment below line
-# java -jar mock-airavata-api-client/target/mock-airavata-api-client-0.15-SNAPSHOT.jar
+# running fabio
+sudo docker run --restart unless-stopped --net=host  -d magiconair/fabio
