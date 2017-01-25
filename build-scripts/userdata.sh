@@ -54,8 +54,7 @@ echo "alias lanip=\"ifconfig eth0 | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0
 
 #run consul on instance
 sudo docker run --net=host  -d  -e 'CONSUL_LOCAL_CONFIG={"translate_wan_addrs": true}' consul \
-        agent -server  -advertise $(lanip) -ui -advertise-wan $(wanip) -bootstrap-expect=1 -datacenter=dc1 \
-         -encrypt HCQzlj+MCHSuybNaGJZbPA== -client=0.0.0.0 -retry-join-wan= <HA-server>
+        agent  -advertise $(lanip) -ui -advertise-wan $(wanip) -client=0.0.0.0 -retry-join-wan= <HA-server>
 
 
 # deploying spring17-api-gateway
