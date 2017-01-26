@@ -1,4 +1,20 @@
 #!/usr/bin/env bash
+command_exists() {
+        command -v "$@" > /dev/null 2>&1
+}
+if command_exists docker; then
+                version="$(docker -v | awk -F '[ ,]+' '{ print $3 }')"
+                MAJOR_W=1
+                MINOR_W=10
+		echo 'Docker is already installed'
+
+else
+		echo 'Installing Docker'
+                sudo yum update -y
+                sudo yum install -y docker
+                sudo service docker start
+fi
+
 
 echo 'Removing the previous image'
 if  [ "$(sudo docker images | grep "^<none>" | awk '{print $3}')" != "" ]; then
@@ -11,7 +27,7 @@ if  [ "$(sudo docker ps -a | grep Exit  )" != "" ]; then
 fi
 
 echo 'check if consul is running'
-if [[ "$(docker ps -q --filter ancestor=consul)" == "" ]]; then
+if [[ "$(sudo docker ps -q --filter ancestor=consul)" == "" ]]; then
     #Allow alias to be used in non-interactive shell
     shopt -s expand_aliases
 
