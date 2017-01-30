@@ -1,11 +1,10 @@
 anguage: java
 branches:
   only:
-    - master
-    - Milestone-5
+    - load-balancing-curator
 notifications:
   email:
-    - bhandar.anuj@gmail.com
+    - eldhomathulla@gmail.com
 jdk:
   - oraclejdk8
 sudo: false
@@ -41,6 +40,6 @@ deploy:
     region: us-east-2
     on:
       repo: airavata-courses/spring17-API-Server
-      all_branches: true
+      all_branches: false
 after_deploy:
 - echo "Performing after deploy procedures..."
