@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /home/ec2-user/api-deployment/spring17-API-Server
+    destination: /home/ubuntu
 hooks:
   BeforeInstall:
     - location: build-scripts/codeDeployBeforeInstall.sh

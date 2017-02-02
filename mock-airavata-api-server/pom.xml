@@ -42,11 +42,33 @@
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>org.apache.airavata.api.server.MockAiravataAPIServer</mainClass>
                                 </transformer>
-                            </transformers>
+                            </transformers>	
+							<outputFile>target/executables/api-server/mock-airavata-api-server.jar</outputFile>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+			<plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.0.2</version>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>target/executables</outputDirectory>
+              <resources>          
+                <resource>
+                  <directory>src/main/resources</directory>
+                </resource>
+              </resources>              
+            </configuration>            
+          </execution>
+        </executions>
+      </plugin>
         </plugins>
     </build>
 

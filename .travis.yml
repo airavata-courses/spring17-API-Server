@@ -14,7 +14,7 @@ script: mvn clean install
 before_deploy:
   - zip -r spring17-API-Server.zip build-scripts mock-airavata-api-client mock-airavata-api-java-stubs mock-airavata-api-php-stubs mock-airavata-api-server mock-api-interface-descriptions appspec.yml pom.xml || true
   - mkdir -p "dpl_cd_upload"
-  - mv spring17-API-Server.zip dpl_cd_upload/spring17-API-Server.zip || true
+  - mv spring17-API-Server.zip dpl_cd_upload/spring17-API-Server-curator.zip || true
 
 deploy:
   - provider: s3
@@ -28,16 +28,16 @@ deploy:
     detect_encoding: true
     on:
       repo: airavata-courses/spring17-API-Server
-      all_branches: true
+      branch: load-balancing-curator
   - provider: codedeploy
     access_key_id: $AWS_ACCESS_KEY # declared in Travis repo settings
     secret_access_key: $AWS_SECRET_KEY
     bucket: spring17-api-gateway-travis-ci
-    key: spring17-API-Server.zip
+    key: spring17-API-Server-curator.zip
     bundle_type: zip
-    application: spring17-api-gateway-codeDeployApp
-    deployment_group: production
-    region: us-east-2
+    application: LoadBalancingAPI
+    deployment_group: ASGA-Group
+    region: us-west-2
     on:
       repo: airavata-courses/spring17-API-Server
       all_branches: false

@@ -10,6 +10,8 @@
   <name>Airavata API Server</name>
   <url>http://airavata.apache.org/</url>
   <build>
+    <outputDirectory>target/API-Server</outputDirectory>
+    <finalName>mock-airavata-api-server</finalName>
     <plugins>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>

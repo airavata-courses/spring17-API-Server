@@ -21,6 +21,8 @@
 
 package org.apache.airavata.api.server;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.nio.ByteBuffer;
 
 import org.apache.airavata.api.credentials.CredentialManagementService;
@@ -34,6 +36,7 @@ import org.apache.curator.generated.DiscoveryInstance;
 import org.apache.curator.generated.DiscoveryProjection;
 import org.apache.curator.generated.DiscoveryService;
 import org.apache.curator.generated.DiscoveryServiceLowLevel;
+import org.apache.http.util.ByteArrayBuffer;
 import org.apache.thrift.TException;
 import org.apache.thrift.TMultiplexedProcessor;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -50,65 +53,119 @@ import org.slf4j.LoggerFactory;
 
 public class MockAiravataAPIServer {
 
-    private final static Logger logger = LoggerFactory.getLogger(MockAiravataAPIServer.class);
+	private final static Logger logger = LoggerFactory.getLogger(MockAiravataAPIServer.class);
+	private static final long WAITTIME = 1;
 
-    public static CredentialManagementHandler credentialManagementHandler;
-    public static CredentialManagementService.Processor credentialManagementProcessor;
+	public static CredentialManagementHandler credentialManagementHandler;
+	public static CredentialManagementService.Processor credentialManagementProcessor;
 
-    public static GatewayManagementHandler gatewayManagementHandler;
-    public static GatewayManagementService.Processor gatewayManagementProcessor;
+	public static GatewayManagementHandler gatewayManagementHandler;
+	public static GatewayManagementService.Processor gatewayManagementProcessor;
 
 	private static TTransport tTransport;
 
 	private static DiscoveryServiceLowLevel.Client discoveryServiceClient;
 
 	private static DiscoveryInstance discoveryInstance;
+	private static Thread thread;
 
-    public static void main(String [] args) {
-        try {
-        	register();
-            credentialManagementHandler = new CredentialManagementHandler();
-            credentialManagementProcessor = new CredentialManagementService.Processor(credentialManagementHandler);
+	private static CuratorProjection curatorProjection;
 
-            gatewayManagementHandler = new GatewayManagementHandler();
-            gatewayManagementProcessor = new GatewayManagementService.Processor(gatewayManagementHandler);
+	private static DiscoveryProjection discoveryProjection;
 
-            TMultiplexedProcessor airavataServerProcessor = new TMultiplexedProcessor();
+	public static void main(String[] args) throws InterruptedException {
+		try {
+			int port;
+			if(args.length>0){
+				port=Integer.parseInt(args[0]);
+			}else{
+				port=9190;
+			}
+			register(port);
+			credentialManagementHandler = new CredentialManagementHandler();
+			credentialManagementProcessor = new CredentialManagementService.Processor(credentialManagementHandler);
 
-            airavataServerProcessor.registerProcessor("CredentialManagementService",credentialManagementProcessor);
-            airavataServerProcessor.registerProcessor("GatewayManagementService",gatewayManagementProcessor);
+			gatewayManagementHandler = new GatewayManagementHandler();
+			gatewayManagementProcessor = new GatewayManagementService.Processor(gatewayManagementHandler);
 
-            TServerTransport serverTransport = new TServerSocket(9190);
+			TMultiplexedProcessor airavataServerProcessor = new TMultiplexedProcessor();
 
-            TServer server = new TThreadPoolServer(new TThreadPoolServer.Args(serverTransport).processor(airavataServerProcessor));
+			airavataServerProcessor.registerProcessor("CredentialManagementService", credentialManagementProcessor);
+			airavataServerProcessor.registerProcessor("GatewayManagementService", gatewayManagementProcessor);
 
-            System.out.println("Starting Mock Airavata API server...");
-            server.serve();
+			TServerTransport serverTransport = new TServerSocket(port);
 
-        } catch (Exception x) {
-            x.printStackTrace();
-        }finally {
-			if(tTransport!=null){
+			TServer server = new TThreadPoolServer(
+					new TThreadPoolServer.Args(serverTransport).processor(airavataServerProcessor));
+
+			System.out.println("Starting Mock Airavata API server...");
+			server.serve();
+
+		} catch (Exception x) {
+			x.printStackTrace();
+		} finally {
+			if (tTransport != null) {
 				tTransport.close();
 			}
+			thread.interrupt();
+			int i = 0;
+			while (thread.isAlive()) {
+				Thread.sleep(1000);
+				i++;
+				if (i > 300) {
+					break;
+				}
+			}
 		}
-    }
-    
-    
-    private static void register() throws CuratorException, TException{
-    	tTransport = new TSocket("localhost", 9090);
-    	tTransport.open();
-    	TProtocolFactory tProtocolFactory=new TBinaryProtocol.Factory();
-    	TProtocol tProtocol=tProtocolFactory.getProtocol(tTransport);
-    	discoveryServiceClient = new DiscoveryServiceLowLevel.Client(tProtocol);
-    	CuratorProjection curatorProjection=new CuratorService.Client(tProtocol).newCuratorProjection("main");
-    	DiscoveryService.Client discoveryServiceOrClient=new DiscoveryService.Client(tProtocol);
-    	discoveryInstance = discoveryServiceOrClient.makeDiscoveryInstance("MicroService", ByteBuffer.allocate(1), 9190);
-    	discoveryInstance.address="localhost";
-    	DiscoveryProjection discoveryProjection=discoveryServiceOrClient.startDiscovery(curatorProjection, "services", discoveryInstance);
-    	discoveryServiceClient.registerInstance(curatorProjection, discoveryProjection, discoveryInstance);
-    	
-    }
+	}
 
+	private static void register(int port) throws CuratorException, TException {
+		Runnable runnable = () -> {
+			while (!Thread.interrupted()) {
+				try {
+					updateDiscoveryInstancePayload();
+					discoveryServiceClient.updateInstance(curatorProjection, discoveryProjection, discoveryInstance);
+					try {
+						Thread.sleep(WAITTIME * 60 * 1000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+						break;
+					}
+				} catch (CuratorException e) {
+					e.printStackTrace();
+				} catch (TException e) {
+					e.printStackTrace();
+				}
+			}
+		};
+		thread = new Thread(runnable);
+		String appName = System.getenv("APP_NAME");
+		tTransport = new TSocket("localhost", 9090);
+		tTransport.open();
+		TProtocolFactory tProtocolFactory = new TBinaryProtocol.Factory();
+		TProtocol tProtocol = tProtocolFactory.getProtocol(tTransport);
+		discoveryServiceClient = new DiscoveryServiceLowLevel.Client(tProtocol);
+		curatorProjection = new CuratorService.Client(tProtocol).newCuratorProjection("main");
+		DiscoveryService.Client discoveryServiceOrClient = new DiscoveryService.Client(tProtocol);
+		discoveryInstance = discoveryServiceOrClient.makeDiscoveryInstance("api-server", ByteBuffer.allocate(1),
+				port);
+		updateDiscoveryInstancePayload();
+		if (appName != null) {
+			discoveryInstance.address = appName;
+		} else {
+			discoveryInstance.address = "localhost";
+		}
+		discoveryInstance.port = 9090;
+		discoveryProjection = discoveryServiceOrClient.startDiscovery(curatorProjection, "services", discoveryInstance);
+		discoveryServiceClient.registerInstance(curatorProjection, discoveryProjection, discoveryInstance);
+		thread.start();
+
+	}
+
+	private static void updateDiscoveryInstancePayload() {
+		OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
+		byte[] bytes = Double.toString(operatingSystemMXBean.getSystemLoadAverage()).getBytes();
+		discoveryInstance.payload = ByteBuffer.wrap(bytes);
+	}
 
 }
