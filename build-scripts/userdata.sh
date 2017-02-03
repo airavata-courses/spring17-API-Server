@@ -73,3 +73,4 @@ nohup java -jar mock-airavata-api-server/target/mock-airavata-api-server-0.15-SN
 
 # Test deployment, uncomment below line
 # java -jar mock-airavata-api-client/target/mock-airavata-api-client-0.15-SNAPSHOT.jar
+python register_service_consul.py
