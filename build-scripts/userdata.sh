@@ -66,7 +66,6 @@ mkdir api-deployment
 cd api-deployment/
 git clone https://github.com/airavata-courses/spring17-API-Server.git
 cd spring17-API-Server/
-git checkout develop
 mvn clean install
 chmod -R a+w /home/ec2-user/api-deplyment
 nohup java -jar mock-airavata-api-server/target/mock-airavata-api-server-0.15-SNAPSHOT.jar &
