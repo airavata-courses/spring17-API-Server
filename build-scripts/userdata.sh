@@ -73,5 +73,8 @@ nohup java -jar mock-airavata-api-server/target/mock-airavata-api-server-0.15-SN
 
 # Test deployment, uncomment below line
 # java -jar mock-airavata-api-client/target/mock-airavata-api-client-0.15-SNAPSHOT.jar
-pip install python-consul
+
+# Registering the service to consul using a python script
+cd /home/ec2-user/api-deployment/spring17-API-Server/build-scripts
+sudo pip install python-consul
 python register_service_consul.py
