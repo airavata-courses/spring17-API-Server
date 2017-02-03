@@ -24,10 +24,23 @@ package org.apache.airavata.api.client;
 import org.apache.airavata.api.credentials.CredentialManagementService;
 import org.apache.airavata.api.gateway.management.GatewayManagementService;
 
+import com.orbitz.consul.AgentClient;
+import com.orbitz.consul.Consul;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
 public class TestAiravataClient {
+
 
     public static void main(String [] args) {
         System.out.println("Testing Airavata API");
+
+        ConsulRegister cr = new ConsulRegister();
+        cr.register();
+
+        ScheduledFuture future = Executors.newScheduledThreadPool(1).scheduleAtFixedRate(new ConsulHealthCheck(), 1, 1, TimeUnit.SECONDS);
 
         CredentialManagementService.Client credentialManagementClient = null;
         GatewayManagementService.Client gatewatManagementClient = null;
@@ -44,3 +57,31 @@ public class TestAiravataClient {
 
     }
 }
+
+class ConsulRegister {
+    public static Consul consul = Consul.builder().build(); // connect to Consul on localhost
+    public static AgentClient agentClient = consul.agentClient();
+
+    public void register(){
+        String serviceName = "API-Server";
+        String serviceId = "1";
+        String fabio_tag = "urlprefix-/API-Server";
+
+        agentClient.register(9190, 3L, serviceName, serviceId, fabio_tag);
+    }
+
+}
+
+class ConsulHealthCheck implements Runnable {
+    @Override
+    public void run() {
+        //Process scheduled task here
+        try {
+            ConsulRegister.agentClient.pass("1");
+        }
+        catch (Exception e){
+            System.out.println(e);
+        }
+    }
+}
+
