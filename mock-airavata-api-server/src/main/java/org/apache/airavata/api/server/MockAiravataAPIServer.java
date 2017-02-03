@@ -92,7 +92,7 @@ class ConsulRegister {
     public void register(){
         String serviceName = "API-Server";
         String serviceId = "1";
-        String fabio_tag = "urlprefix-/APIServer";
+        String fabio_tag = "urlprefix-APIServer/";
 
         agentClient.register(9190, 3L, serviceName, serviceId, fabio_tag);
     }
