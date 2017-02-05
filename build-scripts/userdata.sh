@@ -32,9 +32,9 @@ $AWS_SECRET_ACCESS_KEY
 " | aws configure
 
 # Pushing developers public keys to .ssh/authorized_keys
-echo $ANUJ_SSH_KEY >> ~/.ssh/authorized_keys
-echo $SAGAR_SSH_KEY >> ~/.ssh/authorized_keys
-echo $SUPREET_SSH_KEY >>
+echo $ANUJ_SSH_KEY >> /home/ec2-user/.ssh/authorized_keys
+echo $SAGAR_SSH_KEY >> /home/ec2-user/.ssh/authorized_keys
+echo $SUPREET_SSH_KEY >> /home/ec2-user/.ssh/authorized_keys
 
 # setting up s3 access for aws code deploy
 aws s3 cp s3://aws-codedeploy-us-east-2/latest/install . --region us-east-2
