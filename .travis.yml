@@ -40,6 +40,6 @@ deploy:
     region: us-west-2
     on:
       repo: airavata-courses/spring17-API-Server
-      all_branches: false
+      branch: load-balancing-curator
 after_deploy:
 - echo "Performing after deploy procedures..."
