@@ -22,9 +22,8 @@ if  [ "$(sudo docker images | grep "^<none>" | awk '{print $3}')" != "" ]; then
 fi
 
 echo 'Removing the previous images with exit status'
-if  [ "$(sudo docker ps -a | grep Exit  )" != "" ]; then
-	sudo docker ps -a | grep Exit | cut -d ' ' -f 1 | xargs sudo docker rm
-fi
+sudo docker ps -a | grep Exit | cut -d ' ' -f 1 | xargs  --no-run-if-empty sudo docker rm
+
 
 echo 'check if consul is running'
 if [[ "$(sudo docker ps -q --filter ancestor=consul)" == "" ]]; then
@@ -41,7 +40,15 @@ if [[ "$(sudo docker ps -q --filter ancestor=consul)" == "" ]]; then
             agent  -advertise $(lanip) -ui -advertise-wan $(wanip) -client=0.0.0.0 -retry-join=52.14.96.95
 fi
 
+sudo docker ps -a | grep -w "airavata_api_server" | awk '{print $1}' | xargs --no-run-if-empty docker stop
+sudo docker ps -a | grep -w "airavata_api_server" | awk '{print $1}' | xargs --no-run-if-empty docker rm
 
-cd /home/ec2-user/api-deployment/
-rm -rf spring17-API-Server
-mkdir spring17-API-Server
+echo 'Remove existing images if any'
+sudo docker images | grep -w "airavata_api_server" | awk '{print $3}' | xargs --no-run-if-empty docker rmi -f
+
+echo 'pulling latest image from dockerhub'
+sudo docker pull sagarkrkv/airavata_api_server
+#
+# cd /home/ec2-user/api-deployment/
+# rm -rf spring17-API-Server
+# mkdir spring17-API-Server
