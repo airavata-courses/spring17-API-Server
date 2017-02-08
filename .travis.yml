@@ -6,11 +6,14 @@ branches:
 notifications:
   email:
     - bhandar.anuj@gmail.com
+    - sagarkrkv@gmail.com
 jdk:
   - oraclejdk8
 sudo: false
 install: true
 script: mvn clean install
+services:
+    - docker
 
 after_success:
   - docker build -t sagarkrkv/airavata_api_server:latest .
