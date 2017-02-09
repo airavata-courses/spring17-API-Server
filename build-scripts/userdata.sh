@@ -50,3 +50,23 @@ sudo docker run --restart unless-stopped --net=host  -d  -e 'CONSUL_LOCAL_CONFIG
 
 # running fabio
 sudo docker run --restart unless-stopped --net=host  -d magiconair/fabio
+
+# install HAProxy
+sudo yum install -y haproxy
+
+#install consul-template
+cd /tmp
+wget https://releases.hashicorp.com/consul-template/0.18.1/consul-template_0.18.1_linux_amd64.tgz
+tar -xvzf consul-template_0.18.1_linux_amd64.tgz
+sudo chmod a+x consul-template
+sudo mv consul-template /usr/bin/consul-template
+rm -rf /tmp/consul-template_0.18.1_linux_amd64.tgz
+
+cd /home/ec2-user
+
+#get loadbalancer config
+wget https://s3.us-east-2.amazonaws.com/spring17-api-gateway-travis-ci/loadbalancer.zip
+unzip loadbalancer.zip
+rm -rf loadbalancer.zip build-scripts appspec.yml
+
+nohup sudo consul-template -config=haproxy-config/haproxy.ctmpl &> ctmpl.log &
