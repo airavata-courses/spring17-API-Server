@@ -3,21 +3,6 @@
 # Update the operating System
 sudo yum -y update
 
-#installing open-jdk
-sudo yum install -y java-1.8.0-openjdk-devel.x86_64
-
-#installing apache-maven for building
-sudo wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
-sudo sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
-sudo yum install -y apache-maven
-
-# Setting default JDK to 1.8
-sudo update-alternatives --set java /usr/lib/jvm/jre-1.8.0-openjdk.x86_64/bin/java
-sudo update-alternatives --set javac /usr/lib/jvm/java-1.8.0-openjdk.x86_64/bin/javac
-
-# Installing git version control
-sudo yum install -y git-all.noarch
-
 # Install aws-cli if not installed already
 sudo yum install -y aws-cli
 
@@ -25,16 +10,11 @@ sudo yum install -y aws-cli
 cd /home/ec2-user
 
 # aws configuration
-echo "$AWS_ACCESS_KEY
+su - ec2-user -c 'echo "$AWS_ACCESS_KEY
 $AWS_SECRET_ACCESS_KEY
 
 
-" | aws configure
-
-# Pushing developers public keys to .ssh/authorized_keys
-echo $ANUJ_SSH_KEY >> /home/ec2-user/.ssh/authorized_keys
-echo $SAGAR_SSH_KEY >> /home/ec2-user/.ssh/authorized_keys
-echo $SUPREET_SSH_KEY >> /home/ec2-user/.ssh/authorized_keys
+" | aws configure'
 
 # setting up s3 access for aws code deploy
 aws s3 cp s3://aws-codedeploy-us-east-2/latest/install . --region us-east-2
@@ -44,6 +24,11 @@ sudo ./install auto
 
 # start aws code deploy agent if not started already
 sudo service codedeploy-agent start
+
+# Pushing developers public keys to .ssh/authorized_keys
+su - ec2-user -c 'echo $ANUJ_SSH_KEY >> /home/ec2-user/.ssh/authorized_keys'
+su - ec2-user -c 'echo $SAGAR_SSH_KEY >> /home/ec2-user/.ssh/authorized_keys'
+su - ec2-user -c 'echo $SUPREET_SSH_KEY >> /home/ec2-user/.ssh/authorized_keys'
 
 #install docker engine and start it
 sudo yum install -y docker
@@ -67,13 +52,7 @@ sudo docker run --net=host  -d  -e 'CONSUL_LOCAL_CONFIG={"translate_wan_addrs": 
  #-retry-join-ec2-tag-key name -retry-join-ec2-tag-value spring17-API-loadBalancer-instance
 
 # deploying spring17-api-gateway
-mkdir api-deployment
-cd api-deployment/
-git clone https://github.com/airavata-courses/spring17-API-Server.git
-cd spring17-API-Server/
-mvn clean install
-chmod -R a+w /home/ec2-user/api-deplyment
-nohup java -jar mock-airavata-api-server/target/mock-airavata-api-server-0.15-SNAPSHOT.jar &
+sudo docker run --restart unless-stopped --net=host -d sagarkrkv/airavata_api_server
 
 # Test deployment, uncomment below line
 # java -jar mock-airavata-api-client/target/mock-airavata-api-client-0.15-SNAPSHOT.jar
