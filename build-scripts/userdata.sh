@@ -69,4 +69,4 @@ wget https://s3.us-east-2.amazonaws.com/spring17-api-gateway-travis-ci/loadbalan
 unzip loadbalancer.zip
 rm -rf loadbalancer.zip build-scripts appspec.yml
 
-nohup sudo consul-template -config=haproxy-config/haproxy.ctmpl &> ctmpl.log &
+nohup sudo consul-template -config=haproxy-config/haproxy.hcl &> ctmpl.log &
