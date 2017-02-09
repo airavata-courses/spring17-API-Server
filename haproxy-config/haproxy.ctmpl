@@ -2,7 +2,7 @@ global
     daemon
     quiet
     maxconn 2000
-    nbproc  2
+    nbproc 2
     pidfile /tmp/haproxy.pid
 
 frontend api_server
