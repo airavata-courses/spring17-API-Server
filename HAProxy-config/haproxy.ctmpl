@@ -1,7 +1,8 @@
 global
     daemon
-    maxconn 12
-
+    quiet
+    nbproc  2
+    pidfile /tmp/haproxy.pid
 
 frontend api_server
     bind *:9000
