@@ -66,7 +66,8 @@ cd /home/ec2-user
 
 #get loadbalancer config
 wget https://s3.us-east-2.amazonaws.com/spring17-api-gateway-travis-ci/loadbalancer.zip
-unzip loadbalancer.zip
+unzip -o loadbalancer.zip
 rm -rf loadbalancer.zip build-scripts appspec.yml
-
+mv haproxy-config/haproxy.cfg /tmp/haproxy.cfg
+haproxy -f /tmp/haproxy.cfg -p /tmp/haproxy.pid &> /home/ec2-user/haproxy-init.log &
 nohup sudo consul-template -config=haproxy-config/haproxy.hcl &> ctmpl.log &
