@@ -37,4 +37,4 @@ mock-airavata-api-server/target/generated-sources/
 mock-airavata-api-server/target/original-mock-airavata-api-server-0.15-SNAPSHOT.jar
 /.gitignore
 .idea/
-*/.terraform
+build-scripts/terraform/.terraform

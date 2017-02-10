@@ -21,7 +21,7 @@ after_success:
   - docker push sagarkrkv/airavata_api_server:latest
 
 before_deploy:
-  - zip -r spring17-API-Server.zip build-scripts
+  - zip -r spring17-API-Server.zip build-scripts mock-airavata-api-client mock-airavata-api-java-stubs mock-airavata-api-php-stubs mock-airavata-api-server mock-api-interface-descriptions appspec.yml pom.xml || true
   - mkdir -p "dpl_cd_upload"
   - mv spring17-API-Server.zip dpl_cd_upload/spring17-API-Server.zip || true
 
