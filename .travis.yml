@@ -21,7 +21,7 @@ deploy:
     secret_access_key: $AWS_SECRET_KEY
     local_dir: dpl_cd_upload
     bucket: spring17-api-gateway-travis-ci
-    key: latest/loadbalancer.zip
+    key: loadbalancer.zip
     region: us-east-2
     skip_cleanup: true
     acl: public_read
@@ -33,7 +33,7 @@ deploy:
     access_key_id: $AWS_ACCESS_KEY # declared in Travis repo settings
     secret_access_key: $AWS_SECRET_KEY
     bucket: spring17-api-gateway-travis-ci
-    key: latest/loadbalancer.zip
+    key: loadbalancer.zip
     bundle_type: zip
     application: spring17-api-gateway-codeDeployApp
     deployment_group: LB-Production
