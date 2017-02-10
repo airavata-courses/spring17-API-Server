@@ -4,8 +4,8 @@ files:
   - source: /
     destination: /home/ec2-user/codeDeploy
 hooks:
-  BeforeInstall:
-    - location: build-scripts/codeDeployBeforeInstall.sh
+  #BeforeInstall:
+   # - location: build-scripts/codeDeployBeforeInstall.sh
   AfterInstall:
     - location: build-scripts/codeDeployInstall.sh
       timeout: 300
