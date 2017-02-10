@@ -1,7 +1,7 @@
 global
     daemon
     quiet
-    maxconn 2000
+    maxconn {{keyOrDefault "config/haproxy/maxconn" "2000"}}
     nbproc 2
     pidfile /tmp/haproxy.pid
 
@@ -29,4 +29,4 @@ listen stats *:9997
     stats enable
     stats uri /
     stats hide-version
-    stats auth someuser:password
+    stats auth {{keyOrDefault "config/haproxy/username" "admin"}}:{{keyOrDefault "config/haproxy/password" "password"}}
