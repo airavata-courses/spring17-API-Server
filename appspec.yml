@@ -1,11 +1,11 @@
-version: 0.0
+version: 0.1
 os: linux
-
 files:
   - source: /
-    destination: /home/ec2-user/
-    overwrite: yes
+    destination: /home/ec2-user/codeDeploy
 hooks:
+  BeforeInstall:
+    - location: build-scripts/codeDeployBeforeInstall.sh
   AfterInstall:
     - location: build-scripts/codeDeployInstall.sh
       timeout: 300
