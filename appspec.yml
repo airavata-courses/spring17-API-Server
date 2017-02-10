@@ -1,9 +1,10 @@
 version: 0.0
 os: linux
-overwrite: yes
+
 files:
   - source: /
     destination: /home/ec2-user/
+    overwrite: yes
 hooks:
   AfterInstall:
     - location: build-scripts/codeDeployInstall.sh
