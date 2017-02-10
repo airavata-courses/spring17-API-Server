@@ -28,17 +28,17 @@ deploy:
     on:
       repo: airavata-courses/spring17-API-Server
       all_branches: true
-  # - provider: codedeploy
-  #   access_key_id: $AWS_ACCESS_KEY # declared in Travis repo settings
-  #   secret_access_key: $AWS_SECRET_KEY
-  #   bucket: spring17-api-gateway-travis-ci
-  #   key: loadbalancer.zip
-  #   bundle_type: zip
-  #   application: spring17-api-gateway-codeDeployApp
-  #   deployment_group: production
-  #   region: us-east-2
-  #   on:
-  #     repo: airavata-courses/spring17-API-Server
-  #     all_branches: true
+  - provider: codedeploy
+    access_key_id: $AWS_ACCESS_KEY # declared in Travis repo settings
+    secret_access_key: $AWS_SECRET_KEY
+    bucket: spring17-api-gateway-travis-ci
+    key: loadbalancer.zip
+    bundle_type: zip
+    application: spring17-api-gateway-codeDeployApp
+    deployment_group: LB-Production
+    region: us-east-2
+    on:
+      repo: airavata-courses/spring17-API-Server
+      all_branches: true
 after_deploy:
 - echo "Performing after deploy procedures..."
