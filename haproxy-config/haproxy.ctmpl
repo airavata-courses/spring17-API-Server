@@ -1,7 +1,9 @@
 global
     daemon
-    maxconn 12
-
+    quiet
+    maxconn 2000
+    nbproc 2
+    pidfile /tmp/haproxy.pid
 
 frontend api_server
     bind *:9000
@@ -27,4 +29,4 @@ listen stats *:9997
     stats enable
     stats uri /
     stats hide-version
-    stats auth someuser:password
+    stats auth {{keyOrDefault "config/haproxy/username" "admin"}}:{{keyOrDefault "config/haproxy/password" "password"}}
