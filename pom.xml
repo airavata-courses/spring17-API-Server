@@ -156,6 +156,7 @@
 				<module>mock-airavata-api-server</module>
                 <module>mock-airavata-api-client</module>
                 <module>mock-airavata-api-php-stubs</module>
+                <module>mock-airavata-api-load-tester</module>
 			</modules>
 		</profile>
 
